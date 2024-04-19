@@ -1,0 +1,239 @@
+project 8
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Page with Exercises</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="jquery.domenu-0.0.1.js"></script>
+
+    <style>
+        /* Common CSS styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            position: relative; /* Ensure relative positioning for absolute elements */
+        }
+        .placeholder {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .placeholder img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .container {
+            display: flex;
+            flex: 1; /* Take up all available space */
+            max-width: 1000px; /* Set max-width to prevent content from extending too far */
+            width: 100%; /* Occupy full width */
+            position: relative; /* Ensure relative positioning */
+        }
+        .menu {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            width: 90px;
+            margin-right: 20px; /* Add space between menu and content */
+            position: relative; /* Adjust positioning */
+        }
+        .menu h2 {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .menu li {
+            padding: 5px;
+            text-align: center;
+            position: relative;
+        }
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+        }
+        .menu a:hover {
+            background-color: #555;
+        }
+        .submenu {
+            display: none;
+            position: absolute;
+            top: calc(100% + 5px); /* Position below parent menu item */
+            left: 0;
+            background-color: #555;
+            width: 180px; /* Adjust width */
+            padding: 10px;
+            z-index: 1;
+            border-radius: 5px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow */
+        }
+        .submenu a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 12px 10px 8px; /* Increase top padding for more space at the top */
+            transition: background-color 0.3s, opacity 0.3s, transform 0.3s; /* Smooth transitions */
+        }
+        .content {
+            flex: 1; /* Take up all available space */
+            padding: 20px;
+            overflow: auto; /* Allow content to overflow if necessary */
+            position: relative; /* Ensure relative positioning */
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Additional styles for project descriptions */
+        .project-description {
+            position: absolute;
+            top: 10px; /* Adjust top position as needed */
+            left: -100%; /* Initially position it outside the viewport */
+            font-style: italic;
+            color: #777;
+            text-align: left;
+            display: none; /* Initially hide project description */
+        }
+
+        /* Media Query for Phones */
+        @media screen and (max-width: 600px) {
+            .menu {
+                width: 100%; /* Occupy full width on phones */
+                margin-right: 0; /* Remove margin for phones */
+            }
+            .submenu {
+                width: 100%; /* Occupy full width on phones */
+            }
+            .container {
+                flex-direction: column; /* Stack menu and content vertically */
+            }
+            .project-description {
+                top: 10px; /* Adjust top position for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Placeholder Image -->
+    <div class="placeholder">
+        <img src="placeholder.jpg" alt="Placeholder Image">
+        <p>Welcome to my Project No. 8</p>
+    </div>
+    <!-- Container for Menu and Content -->
+    <div class="container">
+        <!-- Menu -->
+        <div class="menu">
+            <h2>Menu</h2>
+            <ul id="dynamicMenu"></ul> <!-- Placeholder for dynamic menu -->
+        </div>
+        <!-- Content -->
+        <div class="content">
+            <iframe id="exerciseFrame" name="exerciseFrame"></iframe>
+            <div class="project-description" id="projectDescription"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // JSON data representing menu structure
+            var jsonData = [
+                {
+                    "labelp": "Projects",
+                    "children": [
+                        {
+                            "label": "Project 1",
+                            "url": "project1.html",
+                            "description": "Here is Project 1 with a nice interface. Give it a try :P."
+                        },
+                        {
+                            "label": "Project 2",
+                            "url": "project2.html",
+                            "description": "Same as Project 1 but with some changes and using JavaScript and CSS style."
+                        },
+                        {
+                            "label": "Project 3",
+                            "url": "project3.html",
+                            "description": "Here is Project 3. In this code, it shows the method of 2 sorting: selection and quick."
+                        }
+                    ]
+                }
+            ];
+
+            // Function to generate HTML menu from JSON data
+            function generateMenu(menuData, parent) {
+                $.each(menuData, function(index, item) {
+                    var li = $("<li>").text(item.labelp);
+                    if (item.children) {
+                        var submenu = $("<ul class='submenu'>");
+                        generateMenu(item.children, submenu);
+                        li.append(submenu);
+                    } else {
+                        li.append($("<a>").attr("href", item.url).text(item.label).data("description", item.description));
+                    }
+                    parent.append(li);
+                });
+            }
+
+            // Generate dynamic menu from JSON data
+            generateMenu(jsonData, $("#dynamicMenu"));
+
+            // Event handling and effects
+            $('.menu').on({
+                mouseenter: function() {
+                    $('.submenu').stop().slideDown();
+                },
+                mouseleave: function() {
+                    $('.submenu').stop().slideUp();
+                }
+            });
+
+            // Initialize draggable functionality for original submenu items only
+            $('.submenu').sortable({
+                items: "> li", // Only allow sorting of direct children li elements
+                axis: "y", // Allow vertical sorting only
+                cursor: "move", // Set cursor to move when dragging
+                containment: "parent", // Constrain within the parent submenu container
+                tolerance: "pointer", // Change tolerance to pointer for better precision
+                update: function(event, ui) {
+                    // Rebind events after sorting
+                    bindSubMenuClickEvent();
+                }
+            });
+
+            // Load content and description when submenu item is clicked
+            function bindSubMenuClickEvent() {
+                $('.submenu a').click(function(e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    var description = $(this).data('description');
+                    $('#projectDescription').text(description);
+                    $('#projectDescription').css({left: '-100%'}).stop().animate({left: '20px'}, 'fast'); // Animate from left to right
+                    $('.project-description').slideDown();
+                    $('#exerciseFrame').attr('src', url);
+                });
+            }
+
+            // Bind click event initially
+            bindSubMenuClickEvent();
+
+            // Apply DoMenu plugin
+            $(".menu").DoMenu();
+        });
+    </script>
+</body>
+</html>
